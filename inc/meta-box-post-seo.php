@@ -2,7 +2,7 @@
 /**
  * Adds the SEO meta box to the post editing screen for public post types.  This feature allows the post author 
  * to set a custom title, description, and keywords for the post, which will be viewed on the singular post page.  
- * To use this feature, the theme must support the 'essential-core-seo' feature.  The functions in this file create
+ * To use this feature, the theme must support the 'essential-seo-seo-seo' feature.  The functions in this file create
  * the SEO meta box and save the settings chosen by the user when the post is saved.
  *
  * @package    EssentialSEO
@@ -15,13 +15,13 @@
  */
 
 /* Add the post SEO meta box on the 'add_meta_boxes' hook. */
-add_action( 'add_meta_boxes', 'essential_meta_box_post_add_seo', 10, 2 );
-add_action( 'add_meta_boxes', 'essential_meta_box_post_remove_seo', 10, 2 );
+add_action( 'add_meta_boxes', 'essential_seo_meta_box_post_add_seo', 10, 2 );
+add_action( 'add_meta_boxes', 'essential_seo_meta_box_post_remove_seo', 10, 2 );
 
 /* Save the post SEO meta box data on the 'save_post' hook. */
-add_action( 'save_post', 'essential_meta_box_post_save_seo', 10, 2 );
-add_action( 'add_attachment', 'essential_meta_box_post_save_seo' );
-add_action( 'edit_attachment', 'essential_meta_box_post_save_seo' );
+add_action( 'save_post', 'essential_seo_meta_box_post_save_seo', 10, 2 );
+add_action( 'add_attachment', 'essential_seo_meta_box_post_save_seo' );
+add_action( 'edit_attachment', 'essential_seo_meta_box_post_save_seo' );
 
 /**
  * Adds the post SEO meta box for all public post types.
@@ -31,13 +31,13 @@ add_action( 'edit_attachment', 'essential_meta_box_post_save_seo' );
  * @param object $post The current post being edited.
  * @return void
  */
-function essential_meta_box_post_add_seo( $post_type, $post ) {
+function essential_seo_meta_box_post_add_seo( $post_type, $post ) {
 
 	$post_type_object = get_post_type_object( $post_type );
 
 	/* Only add meta box if current user can edit, add, or delete meta for the post. */
 	if ( ( true === $post_type_object->public ) && ( current_user_can( 'edit_post_meta', $post->ID ) || current_user_can( 'add_post_meta', $post->ID ) || current_user_can( 'delete_post_meta', $post->ID ) ) )
-		add_meta_box( 'essential-core-post-seo', __( 'SEO', 'essential-core' ), 'essential_meta_box_post_display_seo', $post_type, 'normal', 'high' );
+		add_meta_box( 'essential-seo-seo-post-seo', __( 'SEO', 'essential-seo-seo' ), 'essential_seo_meta_box_post_display_seo', $post_type, 'normal', 'high' );
 }
 
 /**
@@ -48,15 +48,15 @@ function essential_meta_box_post_add_seo( $post_type, $post ) {
  * @param object $post The current post being edited.
  * @return void
  */ 
-function essential_meta_box_post_remove_seo( $post_type, $post ) {
+function essential_seo_meta_box_post_remove_seo( $post_type, $post ) {
 
 	/* Removes post stylesheets support of the bbPress 'topic' post type. */
 	if ( function_exists( 'bbp_get_topic_post_type' ) && bbp_get_topic_post_type() == $post_type )
-		remove_meta_box( 'essential-core-post-seo', bbp_get_topic_post_type(), 'normal' );
+		remove_meta_box( 'essential-seo-seo-post-seo', bbp_get_topic_post_type(), 'normal' );
 
 	/* Removes post stylesheets support of the bbPress 'reply' post type. */
 	elseif ( function_exists( 'bbp_get_reply_post_type' ) && bbp_get_reply_post_type() == $post_type )
-		remove_meta_box( 'essential-core-post-seo', bbp_get_reply_post_type(), 'normal' );
+		remove_meta_box( 'essential-seo-seo-post-seo', bbp_get_reply_post_type(), 'normal' );
 }
 
 /**
@@ -65,26 +65,26 @@ function essential_meta_box_post_remove_seo( $post_type, $post ) {
  * @since 0.1.0
  * @return void
  */
-function essential_meta_box_post_display_seo( $object, $box ) {
+function essential_seo_meta_box_post_display_seo( $object, $box ) {
 
-	wp_nonce_field( basename( __FILE__ ), 'essential-core-post-seo' ); ?>
+	wp_nonce_field( basename( __FILE__ ), 'essential-seo-seo-post-seo' ); ?>
 
 	<p>
-		<label for="essential-document-title"><?php _e( 'Document Title:', 'essential-core' ); ?></label>
+		<label for="essential-seo-document-title"><?php _e( 'Document Title:', 'essential-seo-seo' ); ?></label>
 		<br />
-		<input type="text" name="essential-document-title" id="essential-document-title" value="<?php echo esc_attr( get_post_meta( $object->ID, 'Title', true ) ); ?>" size="30" tabindex="30" style="width: 99%;" />
+		<input type="text" name="essential-seo-document-title" id="essential-seo-document-title" value="<?php echo esc_attr( get_post_meta( $object->ID, 'Title', true ) ); ?>" size="30" tabindex="30" style="width: 99%;" />
 	</p>
 
 	<p>
-		<label for="essential-meta-description"><?php _e( 'Meta Description:', 'essential-core' ); ?></label>
+		<label for="essential-seo-meta-description"><?php _e( 'Meta Description:', 'essential-seo-seo' ); ?></label>
 		<br />
-		<textarea name="essential-meta-description" id="essential-meta-description" cols="60" rows="2" tabindex="30" style="width: 99%;"><?php echo esc_textarea( get_post_meta( $object->ID, 'Description', true ) ); ?></textarea>
+		<textarea name="essential-seo-meta-description" id="essential-seo-meta-description" cols="60" rows="2" tabindex="30" style="width: 99%;"><?php echo esc_textarea( get_post_meta( $object->ID, 'Description', true ) ); ?></textarea>
 	</p>
 
 	<p>
-		<label for="essential-meta-keywords"><?php _e( 'Meta Keywords:', 'essential-core' ); ?></label>
+		<label for="essential-seo-meta-keywords"><?php _e( 'Meta Keywords:', 'essential-seo-seo' ); ?></label>
 		<br />
-		<input type="text" name="essential-meta-keywords" id="essential-meta-keywords" value="<?php echo esc_attr( get_post_meta( $object->ID, 'Keywords', true ) ); ?>" size="30" tabindex="30" style="width: 99%;" />
+		<input type="text" name="essential-seo-meta-keywords" id="essential-seo-meta-keywords" value="<?php echo esc_attr( get_post_meta( $object->ID, 'Keywords', true ) ); ?>" size="30" tabindex="30" style="width: 99%;" />
 	</p>
 <?php }
 
@@ -95,20 +95,20 @@ function essential_meta_box_post_display_seo( $object, $box ) {
  * @param int $post_id The ID of the current post being saved.
  * @param int $post The post object currently being saved.
  */
-function essential_meta_box_post_save_seo( $post_id, $post = '' ) {
+function essential_seo_meta_box_post_save_seo( $post_id, $post = '' ) {
 
 	/* Fix for attachment save issue in WordPress 3.5. @link http://core.trac.wordpress.org/ticket/21963 */
 	if ( !is_object( $post ) )
 		$post = get_post();
 
 	/* Verify the nonce before proceeding. */
-	if ( !isset( $_POST['essential-core-post-seo'] ) || !wp_verify_nonce( $_POST['essential-core-post-seo'], basename( __FILE__ ) ) )
+	if ( !isset( $_POST['essential-seo-seo-post-seo'] ) || !wp_verify_nonce( $_POST['essential-seo-seo-post-seo'], basename( __FILE__ ) ) )
 		return $post_id;
 
 	$meta = array(
-		'Title' => 	$_POST['essential-document-title'],
-		'Description' => 	$_POST['essential-meta-description'],
-		'Keywords' => 	$_POST['essential-meta-keywords']
+		'Title' => 	$_POST['essential-seo-document-title'],
+		'Description' => 	$_POST['essential-seo-meta-description'],
+		'Keywords' => 	$_POST['essential-seo-meta-keywords']
 	);
 
 	foreach ( $meta as $meta_key => $new_meta_value ) {

@@ -15,22 +15,22 @@
  */
 
 /* Add <meta> elements to the <head> area. */
-add_action( 'wp_head', 'essential_meta_robots', 1 );
-add_action( 'wp_head', 'essential_meta_author', 1 );
-add_action( 'wp_head', 'essential_meta_copyright', 1 );
-add_action( 'wp_head', 'essential_meta_revised', 1 );
-add_action( 'wp_head', 'essential_meta_description', 1 );
-add_action( 'wp_head', 'essential_meta_keywords', 1 );
+add_action( 'wp_head', 'essential_seo_meta_robots', 1 );
+add_action( 'wp_head', 'essential_seo_meta_author', 1 );
+add_action( 'wp_head', 'essential_seo_meta_copyright', 1 );
+add_action( 'wp_head', 'essential_seo_meta_revised', 1 );
+add_action( 'wp_head', 'essential_seo_meta_description', 1 );
+add_action( 'wp_head', 'essential_seo_meta_keywords', 1 );
 
 /**
  * Sets the default meta robots setting.  If private, don't send meta info to the header.  Runs the 
- * essential_meta_robots filter hook at the end.
+ * essential_seo_meta_robots filter hook at the end.
  *
  * @since 0.1.0
  * @access public
  * @return void
  */
-function essential_meta_robots() {
+function essential_seo_meta_robots() {
 
 	/* If the blog is set to private, don't show anything. */
 	if ( !get_option( 'blog_public' ) )
@@ -50,7 +50,7 @@ function essential_meta_robots() {
  * @access public
  * @return void
  */
-function essential_meta_author() {
+function essential_seo_meta_author() {
 
 	/* Set an empty $author variable. */
 	$author = '';
@@ -81,18 +81,18 @@ function essential_meta_author() {
  * @access public
  * @return void
  */
-function essential_meta_copyright() {
+function essential_seo_meta_copyright() {
 
 	/* If viewing a singular post, get the post month and year. */
 	if ( is_singular() )
-		$date = get_the_time( esc_attr__( 'F Y', 'essential-core' ) );
+		$date = get_the_time( esc_attr__( 'F Y', 'essential-seo' ) );
 
 	/* For all other views, get the current year. */
 	else
-		$date = date( esc_attr__( 'Y', 'essential-core' ) );
+		$date = date( esc_attr__( 'Y', 'essential-seo' ) );
 
 	/* Create the HTML for the copyright meta tag. */
-	$copyright = '<meta name="copyright" content="' . sprintf( esc_attr__( 'Copyright (c) %1$s', 'essential-core' ), $date ) . '" />' . "\n";
+	$copyright = '<meta name="copyright" content="' . sprintf( esc_attr__( 'Copyright (c) %1$s', 'essential-seo' ), $date ) . '" />' . "\n";
 
 	echo apply_atomic( 'meta_copyright', $copyright );
 }
@@ -104,14 +104,14 @@ function essential_meta_copyright() {
  * @access public
  * @return void
  */
-function essential_meta_revised() {
+function essential_seo_meta_revised() {
 
 	/* Create an empty $revised variable. */
 	$revised = '';
 
 	/* If viewing a singular post, get the last modified date/time to use in the revised meta tag. */
 	if ( is_singular() )
-		$revised = '<meta name="revised" content="' . get_the_modified_time( esc_attr__( 'l, F jS, Y, g:i a', 'essential-core' ) ) . '" />' . "\n";
+		$revised = '<meta name="revised" content="' . get_the_modified_time( esc_attr__( 'l, F jS, Y, g:i a', 'essential-seo' ) ) . '" />' . "\n";
 
 	echo apply_atomic( 'meta_revised', $revised );
 }
@@ -123,7 +123,7 @@ function essential_meta_revised() {
  * @access public
  * @return void
  */
-function essential_meta_description() {
+function essential_seo_meta_description() {
 
 	/* Set an empty $description variable. */
 	$description = '';
@@ -192,7 +192,7 @@ function essential_meta_description() {
  * @access public
  * @return void
  */
-function essential_meta_keywords() {
+function essential_seo_meta_keywords() {
 
 	/* Set an empty $keywords variable. */
 	$keywords = '';
