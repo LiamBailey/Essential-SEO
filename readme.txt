@@ -1,4 +1,4 @@
-=== Basic-SEO ===
+=== Essential SEO ===
 Contributors: Jagst3r15
 Donate link:
 Tags: seo, search engine optimization, headers, title, meta, meta keywords, meta description
