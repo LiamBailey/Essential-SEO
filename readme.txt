@@ -1,5 +1,5 @@
 === Essential SEO ===
-Contributors: Jagst3r15
+Contributors: James Geiger, Justin Tadlock
 Donate link:
 Tags: seo, search engine optimization, headers, title, meta, meta keywords, meta description
 Requires at least: 3.0
