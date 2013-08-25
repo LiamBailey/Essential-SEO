@@ -6,7 +6,7 @@ Requires at least: 3.0
 Tested up to: 3.6
 Stable tag: trunk
 
-Allows you to add basic search engine optimisations to your WordPress site.
+Allows you to add basic search engine optimizations to your WordPress site.
 
 == Description ==
 
