@@ -1,8 +1,8 @@
 <?php
 /**
  * Adds the SEO meta box to the post editing screen for public post types.  This feature allows the post author 
- * to set a custom title, description, and keywords for the post, which will be viewed on the singular post page.  
- * To use this feature, the theme must support the 'essential-seo-seo-seo' feature.  The functions in this file create
+ * to set a custom title and description for the post, which will be viewed on the singular post page.  
+ * To use this feature, the theme must support the 'essential-seo-seo' feature.  The functions in this file create
  * the SEO meta box and save the settings chosen by the user when the post is saved.
  *
  * @package    EssentialSEO
@@ -37,7 +37,7 @@ function essential_seo_meta_box_post_add_seo( $post_type, $post ) {
 
 	/* Only add meta box if current user can edit, add, or delete meta for the post. */
 	if ( ( true === $post_type_object->public ) && ( current_user_can( 'edit_post_meta', $post->ID ) || current_user_can( 'add_post_meta', $post->ID ) || current_user_can( 'delete_post_meta', $post->ID ) ) )
-		add_meta_box( 'essential-seo-seo-post-seo', __( 'SEO', 'essential-seo-seo' ), 'essential_seo_meta_box_post_display_seo', $post_type, 'normal', 'high' );
+		add_meta_box( 'essential-seo-post-seo', __( 'SEO', 'essential-seo' ), 'essential_seo_meta_box_post_display_seo', $post_type, 'normal', 'high' );
 }
 
 /**
@@ -52,11 +52,11 @@ function essential_seo_meta_box_post_remove_seo( $post_type, $post ) {
 
 	/* Removes post stylesheets support of the bbPress 'topic' post type. */
 	if ( function_exists( 'bbp_get_topic_post_type' ) && bbp_get_topic_post_type() == $post_type )
-		remove_meta_box( 'essential-seo-seo-post-seo', bbp_get_topic_post_type(), 'normal' );
+		remove_meta_box( 'essential-seo-post-seo', bbp_get_topic_post_type(), 'normal' );
 
 	/* Removes post stylesheets support of the bbPress 'reply' post type. */
 	elseif ( function_exists( 'bbp_get_reply_post_type' ) && bbp_get_reply_post_type() == $post_type )
-		remove_meta_box( 'essential-seo-seo-post-seo', bbp_get_reply_post_type(), 'normal' );
+		remove_meta_box( 'essential-seo-post-seo', bbp_get_reply_post_type(), 'normal' );
 }
 
 /**
@@ -67,25 +67,20 @@ function essential_seo_meta_box_post_remove_seo( $post_type, $post ) {
  */
 function essential_seo_meta_box_post_display_seo( $object, $box ) {
 
-	wp_nonce_field( basename( __FILE__ ), 'essential-seo-seo-post-seo' ); ?>
+	wp_nonce_field( basename( __FILE__ ), 'essential-seo-post-seo' ); ?>
 
 	<p>
-		<label for="essential-seo-document-title"><?php _e( 'Document Title:', 'essential-seo-seo' ); ?></label>
+		<label for="essential-seo-document-title"><?php _e( 'Document Title:', 'essential-seo' ); ?></label>
 		<br />
 		<input type="text" name="essential-seo-document-title" id="essential-seo-document-title" value="<?php echo esc_attr( get_post_meta( $object->ID, 'Title', true ) ); ?>" size="30" tabindex="30" style="width: 99%;" />
 	</p>
 
 	<p>
-		<label for="essential-seo-meta-description"><?php _e( 'Meta Description:', 'essential-seo-seo' ); ?></label>
+		<label for="essential-seo-meta-description"><?php _e( 'Meta Description:', 'essential-seo' ); ?></label>
 		<br />
 		<textarea name="essential-seo-meta-description" id="essential-seo-meta-description" cols="60" rows="2" tabindex="30" style="width: 99%;"><?php echo esc_textarea( get_post_meta( $object->ID, 'Description', true ) ); ?></textarea>
 	</p>
 
-	<p>
-		<label for="essential-seo-meta-keywords"><?php _e( 'Meta Keywords:', 'essential-seo-seo' ); ?></label>
-		<br />
-		<input type="text" name="essential-seo-meta-keywords" id="essential-seo-meta-keywords" value="<?php echo esc_attr( get_post_meta( $object->ID, 'Keywords', true ) ); ?>" size="30" tabindex="30" style="width: 99%;" />
-	</p>
 <?php }
 
 /**
@@ -102,13 +97,12 @@ function essential_seo_meta_box_post_save_seo( $post_id, $post = '' ) {
 		$post = get_post();
 
 	/* Verify the nonce before proceeding. */
-	if ( !isset( $_POST['essential-seo-seo-post-seo'] ) || !wp_verify_nonce( $_POST['essential-seo-seo-post-seo'], basename( __FILE__ ) ) )
+	if ( !isset( $_POST['essential-seo-post-seo'] ) || !wp_verify_nonce( $_POST['essential-seo-post-seo'], basename( __FILE__ ) ) )
 		return $post_id;
 
 	$meta = array(
 		'Title' => 	$_POST['essential-seo-document-title'],
-		'Description' => 	$_POST['essential-seo-meta-description'],
-		'Keywords' => 	$_POST['essential-seo-meta-keywords']
+		'Description' => 	$_POST['essential-seo-meta-description']
 	);
 
 	foreach ( $meta as $meta_key => $new_meta_value ) {
