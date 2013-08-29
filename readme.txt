@@ -14,7 +14,7 @@ A very basic SEO plugin.
 
 == Installation ==
 
-1. Upload essential-seo.php to the "/wp-content/plugins/" directory
+1. Upload "essential-seo" to the "/wp-content/plugins/" directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Changelog ==

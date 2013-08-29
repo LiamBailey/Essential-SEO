@@ -22,10 +22,9 @@ class Essential_SEO {
 
 	public static function setup() {
 
-		add_action( 'plugins_loaded', array('Essential_SEO', 'essential_seo_plugins_loaded' ), 1);
+		add_action( 'plugins_loaded', array('Essential_SEO', 'essential_seo_constants'));
 
-		add_action( 'constants', array('Essential_SEO', 'essential_seo_constants' ), 2);
-
+		add_action( 'plugins_loaded', array('Essential_SEO','essential_seo_plugins_loaded' ));
 
 	}
 
