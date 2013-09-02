@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SEO and header functions.  Not all things in this file are strictly for search engine optimization.  Many 
  * of the functions handle basic <meta> elements for the <head> area of the site.  This file is a catchall file 
@@ -13,53 +14,54 @@
  * @link       http://seamlessthemes.com
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
-
 /* Add <meta> elements to the <head> area. */
-add_action( 'wp_head', 'essential_seo_start', 1 );
-add_action( 'wp_head', 'rel_canonical', 1);
-add_action( 'wp_head', 'essential_seo_author', 1 );
-add_action( 'wp_head', 'essential_seo_meta_robots', 1 );
-add_action( 'wp_head', 'essential_seo_meta_description', 1 );
-add_action( 'wp_head', 'essential_seo_end', 1 );
-
+add_action('wp_head', 'essential_seo_start', 1);
+add_action('wp_head', 'rel_canonical', 1);
+add_action('wp_head', 'essential_seo_author_publisher', 1);
+add_action('wp_head', 'essential_seo_meta_robots', 1);
+add_action('wp_head', 'essential_seo_meta_description', 1);
+add_action('wp_head', 'essential_seo_verifications', 1);
+add_action('wp_head', 'essential_seo_end', 1);
+add_filter('wp_title', 'essential_seo_title', 25, 3);
+add_action('init','essential_seo_check_title');
 remove_action('wp_head', 'rel_canonical');
 
 function extra_contact_info($contactmethods) {
 
-	$contactmethods['googleplus'] = 'Google+';
+    $contactmethods['googleplus'] = 'Google+';
 
 
-	return $contactmethods;
-
+    return $contactmethods;
 }
 
 add_filter('user_contactmethods', 'extra_contact_info');
 
-
 function essential_seo_start() {
 
-	echo "\n" . '<!-- Start Essential SEO -->' . "\n";
+    echo "\n" . '<!-- Start Essential SEO -->' . "\n";
 }
 
-function essential_seo_author() {
-	$gplus = '';
+function essential_seo_author_publisher() {
+    global $essential_settings;
+    
+    $gplus = '';
 
-	if ( is_home() || is_front_page() ) {
-		$gplus = get_the_author_meta( 'googleplus');
+    if (is_home() || is_front_page()) {
+        $gplus = get_the_author_meta('googleplus');
+    } else if (is_singular()) {
+        global $post;
+        $gplus = get_the_author_meta('googleplus', $post->post_author);
+    }
 
-	}
-	else if ( is_singular() ) {
-		global $post;
-		$gplus = get_the_author_meta( 'googleplus', $post->post_author );
-	}
+    $gplus = apply_filters('author', $gplus);
 
-	$gplus = apply_filters( 'author', $gplus );
+    if ($gplus)
+        $gplus = '<link rel="author" href="' . $gplus . '"/>' . "\n";
 
-	if ( $gplus )
-		$gplus = '<link rel="author" href="' . $gplus . '"/>' . "\n";
-
-	echo apply_filters ( 'author', $gplus );
-
+    echo apply_filters('author', $gplus);
+    if (isset($essential_settings['google-plus-publisher']) && !empty($essential_settings['google-plus-publisher'])) {
+        echo '<link rel="publisher" href="' . esc_url($essential_settings['google-plus-publisher']) . '" />' . "\n";
+    }
 }
 
 /**
@@ -72,21 +74,20 @@ function essential_seo_author() {
  */
 function essential_seo_meta_robots() {
 
-	/* Do not display index and follow tags on the following. It is the browser default. */
-	if ((is_home() && ($paged < 2 )) || is_front_page() || is_single() || is_page() || is_attachment()) {
-		return;
-	}
+    /* Do not display index and follow tags on the following. It is the browser default. */
+    if ((is_home() && ($paged < 2 )) || is_front_page() || is_single() || is_page() || is_attachment()) {
+        return;
+    }
 
-	/* If viewing a search page, display noindex and nofollow. */
-	elseif ( is_search() ) {
-		$robots = '<meta name="robots" content="noindex,nofollow" />' . "\n";
+    /* If viewing a search page, display noindex and nofollow. */ elseif (is_search()) {
+        $robots = '<meta name="robots" content="noindex,nofollow" />' . "\n";
 
-	/* If viewing any other page display noidex and follow. */
-	} else {
-		$robots = '<meta name="robots" content="noindex,follow" />' . "\n";
-	}
+        /* If viewing any other page display noidex and follow. */
+    } else {
+        $robots = '<meta name="robots" content="noindex,follow" />' . "\n";
+    }
 
-	echo apply_filters ( 'meta_robots', $robots );
+    echo apply_filters('meta_robots', $robots);
 }
 
 /**
@@ -98,69 +99,124 @@ function essential_seo_meta_robots() {
  */
 function essential_seo_meta_description() {
 
-	/* Set an empty $description variable. */
-	$description = '';
+    /* Set an empty $description variable. */
+    $description = '';
 
-	/* If viewing the home/posts page, get the site's description. */
-	if ( is_home() ) {
-		$description = get_bloginfo( 'description' );
-	}
+    /* If viewing the home/posts page, get the site's description. */
+    if (is_home()) {
+        $description = get_bloginfo('description');
+    }
 
-	/* If viewing a singular post. */
-	elseif ( is_singular() ) {
+    /* If viewing a singular post. */ elseif (is_singular()) {
 
-		/* Get the meta value for the 'Description' meta key. */
-		$description = get_post_meta( get_queried_object_id(), 'Description', true );
+        /* Get the meta value for the 'Description' meta key. */
+        $description = get_post_meta(get_queried_object_id(), 'Description', true);
 
-		/* If no description was found and viewing the site's front page, use the site's description. */
-		if ( empty( $description ) && is_front_page() )
-			$description = get_bloginfo( 'description' );
+        /* If no description was found and viewing the site's front page, use the site's description. */
+        if (empty($description) && is_front_page())
+            $description = get_bloginfo('description');
 
-		/* For all other singular views, get the post excerpt. */
-		elseif ( empty( $description ) )
-			$description = get_post_field( 'post_excerpt', get_queried_object_id() );
-	}
+        /* For all other singular views, get the post excerpt. */
+        elseif (empty($description))
+            $description = get_post_field('post_excerpt', get_queried_object_id());
+    }
 
-	/* If viewing an archive page. */
-	elseif ( is_archive() ) {
+    /* If viewing an archive page. */
+    elseif (is_archive()) {
 
-		/* If viewing a user/author archive. */
-		if ( is_author() ) {
+        /* If viewing a user/author archive. */
+        if (is_author()) {
 
-			/* Get the meta value for the 'Description' user meta key. */
-			$description = get_user_meta( get_query_var( 'author' ), 'Description', true );
+            /* Get the meta value for the 'Description' user meta key. */
+            $description = get_user_meta(get_query_var('author'), 'Description', true);
 
-			/* If no description was found, get the user's description (biographical info). */
-			if ( empty( $description ) )
-				$description = get_the_author_meta( 'description', get_query_var( 'author' ) );
-		}
+            /* If no description was found, get the user's description (biographical info). */
+            if (empty($description))
+                $description = get_the_author_meta('description', get_query_var('author'));
+        }
 
-		/* If viewing a taxonomy term archive, get the term's description. */
-		elseif ( is_category() || is_tag() || is_tax() )
-			$description = term_description( '', get_query_var( 'taxonomy' ) );
+        /* If viewing a taxonomy term archive, get the term's description. */
+        elseif (is_category() || is_tag() || is_tax())
+            $description = term_description('', get_query_var('taxonomy'));
 
-		/* If viewing a custom post type archive. */
-		elseif ( is_post_type_archive() ) {
+        /* If viewing a custom post type archive. */
+        elseif (is_post_type_archive()) {
 
-			/* Get the post type object. */
-			$post_type = get_post_type_object( get_query_var( 'post_type' ) );
+            /* Get the post type object. */
+            $post_type = get_post_type_object(get_query_var('post_type'));
 
-			/* If a description was set for the post type, use it. */
-			if ( isset( $post_type->description ) )
-				$description = $post_type->description;
-		}
-	}
+            /* If a description was set for the post type, use it. */
+            if (isset($post_type->description))
+                $description = $post_type->description;
+        }
+    }
 
-	/* Format the meta description. */
-	if ( !empty( $description ) )
-		$description = '<meta name="description" content="' . str_replace( array( "\r", "\n", "\t" ), '', esc_attr( strip_tags( $description ) ) ) . '" />' . "\n";
+    /* Format the meta description. */
+    if (!empty($description))
+        $description = '<meta name="description" content="' . str_replace(array("\r", "\n", "\t"), '', esc_attr(strip_tags($description))) . '" />' . "\n";
 
-	echo apply_filters ( 'meta_description', $description );
+    echo apply_filters('meta_description', $description);
+}
+
+/**
+ * Adds verification for Google Bing and Pinterest
+ * @return void
+ */
+function essential_seo_verifications() {
+    global $essential_settings;
+    foreach($essential_settings['verifications'] as $verification) {
+        if (!empty($verification)) {
+            echo $verification . "\n";
+        }
+    }
+    
 }
 
 function essential_seo_end() {
 
-	echo '<!-- End Essential SEO -->' . "\n\n";
+    echo '<!-- End Essential SEO -->' . "\n\n";
+}
+
+/**
+ * Main title function.
+ *
+ * @param string $title       Title that might have already been set.
+ * @param string $sepinput    Separator determined in theme.
+ * @param string $seplocation Position of seperator left or right.
+ *
+ * @return string
+ */
+function essential_seo_title($title, $sepinput = '-', $seplocation = '') {
+    global $post;
+    
+    $set_title = get_post_meta($post->ID,'Title',true);
+    if (!$set_title) {
+        return $title;
+    }
+    return $set_title;
+}
+
+function essential_seo_check_title() {
+    if (is_admin()) {
+    global $post;
+    ob_start();
+    $set_title = get_post_meta($post->ID,'Title',true);
+    $dom = new DOMDocument();
+    locate_template("header.php",true,true);
+    libxml_use_internal_errors(true);
+    $dom->loadHTML(ob_get_contents());
+    $test_title = $dom->getElementsByTagName('title')->item(0)->textContent;
+    if ($test_title != $set_title) {
+        add_action('admin_notices','no_wp_title');
+    }
+    ob_end_clean();
+    }
+}
+
+function no_wp_title() {
+     echo '<div class="updated">
+       <p>Essential SEO Notice: Your theme does not use wp_title properly, this means we cannot use your chosen &lt;title&gt; for your posts.</p>
+    </div>';
 }
 
 ?>

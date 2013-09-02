@@ -25,7 +25,7 @@ class Essential_SEO {
 		add_action( 'plugins_loaded', array('Essential_SEO', 'essential_seo_constants'));
 
 		add_action( 'plugins_loaded', array('Essential_SEO','essential_seo_plugins_loaded' ));
-
+                
 	}
 
 
@@ -60,6 +60,7 @@ class Essential_SEO {
 		require_once( ESSENTIAL_SEO_PATH . 'inc/counter.php' );
 		require_once( ESSENTIAL_SEO_PATH . 'inc/essential-seo.php' );
 		require_once( ESSENTIAL_SEO_PATH . 'inc/meta-box-post-seo.php' );
+                require_once( ESSENTIAL_SEO_PATH . 'inc/essential-seo-settings.php');
 	}
 
 }
