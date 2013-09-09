@@ -3,7 +3,7 @@
  * Plugin Name: Essential SEO
  * Plugin URI: http://seamlessthemes.com/
  * Description: A very basic, yet powerful, SEO Plugin.
- * Version: 0.2.0
+ * Version: 0.2.2
  * Author: James Geiger
  * Author URI: http://seamlessthemes.com
  *

@@ -22,3 +22,10 @@ A very basic SEO plugin.
 * Fixed fatal error with apply_atomic(). Used apply_filters instead.
 = 0.1.0 (08/25/2013) =
 * Initial release.
+= 2.0.1 (09/01/2013) =
+Incorporates title into output, adds settings page with field for
+Google plus publisher url as well as verifications for Google Webmaster Tools,
+Bing and Pinterest. Also adds the metas for these into wp_head.
+= 2.0.2 (09/09/2013) =
+Fixes bug where check_for_wp_title was breaking admin's script enqueue capabilities.
+Also improves check_for_wp_title to make more comprehensive check.

@@ -23,7 +23,7 @@ add_action('wp_head', 'essential_seo_meta_description', 1);
 add_action('wp_head', 'essential_seo_verifications', 1);
 add_action('wp_head', 'essential_seo_end', 1);
 add_filter('wp_title', 'essential_seo_title', 25, 3);
-add_action('init','essential_seo_check_title');
+add_action('admin_head', 'check_for_wp_title', 1);
 remove_action('wp_head', 'rel_canonical');
 
 function extra_contact_info($contactmethods) {
@@ -43,7 +43,7 @@ function essential_seo_start() {
 
 function essential_seo_author_publisher() {
     global $essential_settings;
-    
+
     $gplus = '';
 
     if (is_home() || is_front_page()) {
@@ -164,12 +164,11 @@ function essential_seo_meta_description() {
  */
 function essential_seo_verifications() {
     global $essential_settings;
-    foreach($essential_settings['verifications'] as $verification) {
+    foreach ($essential_settings['verifications'] as $verification) {
         if (!empty($verification)) {
             echo $verification . "\n";
         }
     }
-    
 }
 
 function essential_seo_end() {
@@ -188,33 +187,54 @@ function essential_seo_end() {
  */
 function essential_seo_title($title, $sepinput = '-', $seplocation = '') {
     global $post;
-    
-    $set_title = get_post_meta($post->ID,'Title',true);
+
+    $set_title = get_post_meta($post->ID, 'Title', true);
     if (!$set_title) {
         return $title;
     }
     return $set_title;
 }
 
-function essential_seo_check_title() {
-    if (is_admin()) {
+/**
+ * Checks if theme uses wp_title
+ *
+ * @since 0.2.1
+ * @return boolean
+ */
+function check_for_wp_title() {
     global $post;
-    ob_start();
-    $set_title = get_post_meta($post->ID,'Title',true);
-    $dom = new DOMDocument();
-    locate_template("header.php",true,true);
-    libxml_use_internal_errors(true);
-    $dom->loadHTML(ob_get_contents());
-    $test_title = $dom->getElementsByTagName('title')->item(0)->textContent;
-    if ($test_title != $set_title) {
-        add_action('admin_notices','no_wp_title');
-    }
-    ob_end_clean();
+    if (get_class($post) == "WP_Post") {
+        ob_start();
+        get_header();
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML(ob_get_contents());
+        ob_end_clean();
+        $title = $dom->getElementsByTagName('title')->item(0)->nodeValue;
+        $set_title = get_post_meta($post->ID, 'Title', true);
+        if ($set_title && $title != $set_title) {
+            add_action('admin_notices', 'no_wp_title');
+        }
+        return;
+    } else {
+        global $wpdb;
+        $a_titled_post = $wpdb->get_results($wpdb->prepare("SELECT post_id, meta_value FROM wp_postmeta WHERE meta_key = '%s' AND meta_value != '' LIMIT 1", "Title"), ARRAY_A);
+        //print_r($a_titled_post);
+        if ($wpdb->num_rows > 0) {
+            $set_title = $a_titled_post[0]['meta_value'];
+            $dom = new DOMDocument();
+            libxml_use_internal_errors(true);
+            $dom->loadHTMLFile(get_permalink($a_titled_post[0]['post_id']));
+            $title = $dom->getElementsByTagName('title')->item(0)->nodeValue;
+            if ($set_title != $title) {
+                add_action('admin_notices', 'no_wp_title');
+            }
+        }
     }
 }
 
 function no_wp_title() {
-     echo '<div class="updated">
+    echo '<div class="updated">
        <p>Essential SEO Notice: Your theme does not use wp_title properly, this means we cannot use your chosen &lt;title&gt; for your posts.</p>
     </div>';
 }
